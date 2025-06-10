@@ -18,9 +18,15 @@ const Navbar = () => {
         </Link>
 
         {/* OPCIONES DE NAVEGACIÓN */}
-        <div className="felx space-x-6">
+        <div className="flex space-x-6">
           <Link
-            href="../login/layout"
+            href="../registro/page"
+            className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+          >
+            Inscripción
+          </Link>
+          <Link
+            href="../login/page"
             className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
           >
             Inicia sesión
