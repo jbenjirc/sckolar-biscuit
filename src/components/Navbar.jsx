@@ -20,13 +20,13 @@ const Navbar = () => {
         {/* OPCIONES DE NAVEGACIÓN */}
         <div className="flex space-x-6">
           <Link
-            href="../registro/page"
+            href="../registro"
             className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
           >
             Inscripción
           </Link>
           <Link
-            href="../login/page"
+            href="../login"
             className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
           >
             Inicia sesión
