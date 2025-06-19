@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Func POST
-
 export async function POST(request) {
   let client;
 
@@ -67,8 +66,38 @@ export async function POST(request) {
       );
     }
 
-    // --- GENERACIÓN DEL JWT ---
+    // --- DEFINICIÓN DE DURACIONES DE SESIÓN POR ROL ---
+    let expiresInValue;
+    let maxAgeSecondsValue;
 
+    switch (user.rol_codigo) {
+      case "ADMIN":
+        expiresInValue = "2h";
+        maxAgeSecondsValue = 1260; // (2 * 60 * 60) + 60 seg
+        break;
+      case "DOCEN":
+        expiresInValue = "1.5h";
+        maxAgeSecondsValue = 5460; // (1.5 * 60 * 60) + 60 seg
+        break;
+      case "ALUMN":
+        expiresInValue = "1h";
+        maxAgeSecondsValue = 3660; // (1 * 60 * 60) + 60 seg
+        break;
+      case "TUTOR":
+        expiresInValue = "1h";
+        maxAgeSecondsValue = 3660; // (1 * 60 * 60) + 60 seg
+        break;
+      case "ASPIR":
+        expiresInValue = "30m";
+        maxAgeSecondsValue = 1860; // (0.5 * 60 * 60) + 60 seg
+        break;
+      default: // Rol por defecto o desconocido
+        expiresInValue = "30m";
+        maxAgeSecondsValue = 1860;
+        break;
+    }
+
+    // --- GENERACIÓN DEL JWT ---
     const tokenPayload = {
       userId: user.id,
       userEmail: user.email,
@@ -76,7 +105,9 @@ export async function POST(request) {
     };
 
     // Generación del token
-    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "0.5h" });
+    const generatedToken = jwt.sign(tokenPayload, JWT_SECRET, {
+      expiresIn: "0.5h",
+    });
 
     // DATOS DE USUARIO
     const userData = {
@@ -94,12 +125,12 @@ export async function POST(request) {
         user: userData,
       }),
       {
-        status: 200,
+        status: 200, // OK
         headers: {
           "Content-Type": "application/json",
           //TOKEN CONFIG
           "Set-Cookie":
-            `token=${token}; HttpOnly; Path=/; Max-Age=360; SameSite=Lax` +
+            `token=${generatedToken}; HttpOnly; Path=/; Max-Age=360; SameSite=Lax` +
             (process.env.NODE_ENV === "production" ? "; Secure" : ""),
         },
       }
