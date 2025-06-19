@@ -1,5 +1,10 @@
 import { getClient } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Func POST
 
 export async function POST(request) {
   let client;
@@ -62,7 +67,18 @@ export async function POST(request) {
       );
     }
 
-    // SUCCESS
+    // --- GENERACIÓN DEL JWT ---
+
+    const tokenPayload = {
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.rol_codigo,
+    };
+
+    // Generación del token
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "0.5h" });
+
+    // DATOS DE USUARIO
     const userData = {
       id: user.id,
       email: user.email,
@@ -72,19 +88,24 @@ export async function POST(request) {
       ap_mat: user.ap_mat,
     };
 
-    // JSON Web Token (JWT)
-    // --
-
-    return new Response(
+    const response = new Response(
       JSON.stringify({
         message: "Inicio de sesión exitoso :)",
         user: userData,
       }),
       {
         status: 200,
-        headers: { "Content-type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          //TOKEN CONFIG
+          "Set-Cookie":
+            `token=${token}; HttpOnly; Path=/; Max-Age=360; SameSite=Lax` +
+            (process.env.NODE_ENV === "production" ? "; Secure" : ""),
+        },
       }
     );
+
+    return response;
   } catch (error) {
     console.error("Error en en login", error);
     return new Response(
