@@ -1,3 +1,4 @@
+// skolar-biscuit-nextjs/src/contexts/AuthContext.jsx
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from "react";
@@ -33,8 +34,8 @@ export const AuthProvider_ = ({ children }) => {
   const logout_ = async (redirect = true) => {
     // Manda a llamar a la API Route de logout para eliminar la cokie  HttpOnly
     try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
-      if (response.ok) {
+      const response_ = await fetch("/api/auth/logout", { method: "POST" });
+      if (response_.ok) {
         setUser(null);
         setIsAuthenticated(false);
         if (redirect) {
@@ -51,9 +52,39 @@ export const AuthProvider_ = ({ children }) => {
   };
 
   useEffect(() => {
-    // Verificación aquí
-    setLoadingAuth(false);
-  }, []);
+    const verifySession_ = async () => {
+      try {
+        const response_ = await fetch("/api/auth/session");
+        const data_ = await response_.json();
+
+        if (response_.ok && data_.isAuthenticated) {
+          // Si se confirma la Auth, entonces se actualiza el estado
+          setUser(data_.user);
+          setIsAuthenticated(true);
+        } else {
+          // Si no, se limpia el estado
+          setUser(null);
+          setIsAuthenticated(false);
+          // Si la API devuelve 401 o una sesión no válida, redirecciona al login
+          if (router.pathname !== "/login") {
+            router.push("/login");
+          }
+        }
+      } catch (error) {
+        console.error("Error al verificar la sesión:", error);
+        setUser(null);
+        setIsAuthenticated(false);
+
+        if (router.pathname !== "/login") {
+          router.push("/login"); // Redirige al login en caso de error de red
+        }
+      } finally {
+        setLoadingAuth(false); // La carga se finaliza sin importar el resultado
+      }
+    };
+
+    verifySession_();
+  }, [router]);
 
   const AuthContextValue_ = {
     user,
@@ -66,7 +97,7 @@ export const AuthProvider_ = ({ children }) => {
 
   return (
     <AuthContext_.Provider value={AuthContextValue_}>
-      {children}{" "}
+      {children}
       {/* Renderiza los componentes hijos envueltos por el proveedor. */}
     </AuthContext_.Provider>
   );
@@ -74,10 +105,10 @@ export const AuthProvider_ = ({ children }) => {
 
 // 3. Hook Personalizado para Consumir el Contexto (useAuth)
 export const useAuth_ = () => {
-  const context = useContext(AuthContext_);
+  const context_ = useContext(AuthContext_);
 
-  if (context === undefined) {
+  if (context_ === undefined) {
     throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   }
-  return context;
+  return context_;
 };
