@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useAuth_ } from "@/contexts/AuthContext";
+
 export default function LoginPage() {
   // Estados para los campos del formulario
   const [email, setEmail] = useState("");
@@ -18,7 +20,9 @@ export default function LoginPage() {
   //Instancia del router para redirección
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const { login_ } = useAuth_();
+
+  const handleSubmit_ = async (e) => {
     e.preventDefault();
 
     setMessage("");
@@ -26,7 +30,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response_ = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -35,11 +39,11 @@ export default function LoginPage() {
       });
 
       // Parsea la respuesta del servidor
-      const data = await response.json();
+      const data_ = await response_.json();
 
-      if (!response.ok) {
+      if (!response_.ok) {
         setIsError(true);
-        setMessage(data.error || "Error al iniciar sesión.");
+        setMessage(data_.error || "Error al iniciar sesión.");
         return;
       }
 
@@ -47,12 +51,7 @@ export default function LoginPage() {
       setMessage("Inicio de sesión exitoso. Redirigiendo...");
       setIsError(false);
 
-      // JSON Web Token (JWT)
-      // --
-
-      setTimeout(() => {
-        router.push("/"); // Redirige a la página de inicio
-      }, 1500);
+      login_(data_.user);
     } catch (error) {
       console.error("Error al iniciar sesión", error);
       setIsError(true);
@@ -68,7 +67,7 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Iniciar sesión
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit_} className="space-y-6">
           {/* Campo de email */}
           <div>
             <label
