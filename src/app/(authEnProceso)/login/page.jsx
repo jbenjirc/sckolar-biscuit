@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 
 import { useAuth_ } from "@/contexts/AuthContext";
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   //Instancia del router para redirección
-  const router = useRouter();
+  //const router = useRouter();
 
   const { login_ } = useAuth_();
 
@@ -33,7 +33,7 @@ export default function LoginPage() {
       const response_ = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });

@@ -2,14 +2,14 @@ import { getClient } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET_ = process.env.JWT_SECRET;
 
 // Func POST
 export async function POST(request) {
-  let client;
+  let client_;
 
   try {
-    client = await getClient();
+    client_ = await getClient();
 
     const { email, password } = await request.json();
 
@@ -19,14 +19,14 @@ export async function POST(request) {
         JSON.stringify({ error: "Email y contraseña son obligatorios." }),
         {
           status: 400, // 400 Bad Request
-          headers: { "Content-type": "application/json" },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // 2. VALIDACIÓN: Cuenta
-    const userResult = await client.query(
-      "SELECT id, email, password_hash, rol_codigo, nombre, ap_pat, ap_mat, is_active FROM usuarios WHERE email = $1",
+    const userResult = await client_.query(
+      "SELECT id, email, password_hash, nombre, ap_pat, ap_mat, rol_codigo, is_active, fecha_registro FROM usuarios WHERE email = $1",
       [email]
     );
     const user = userResult.rows[0];
@@ -36,7 +36,7 @@ export async function POST(request) {
         JSON.stringify({ error: "Credenciales inválidas." }),
         {
           status: 401, // 401 Unauthorized
-          headers: { "Content-type": "application/json" },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -48,81 +48,83 @@ export async function POST(request) {
         }),
         {
           status: 403, // 403 Forbidden
-          headers: { "Content-type": "application/json" },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // 3. VALIDACIÓN: Contraseña
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    const passwordMatch_ = await bcrypt.compare(password, user.password_hash);
     // Contraseña incorrecta
-    if (!passwordMatch) {
+    if (!passwordMatch_) {
       return new Response(
         JSON.stringify({ error: "Credenciales inválidas." }),
         {
           status: 401, // 401 unauthorized
-          headers: { "Conttent-type": "application/json" },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // --- DEFINICIÓN DE DURACIONES DE SESIÓN POR ROL ---
-    let expiresInValue;
-    let maxAgeSecondsValue;
+    let expiresInValue_;
+    let maxAgeSecondsValue_;
 
     switch (user.rol_codigo) {
       case "ADMIN":
-        expiresInValue = "2h";
-        maxAgeSecondsValue = 1260; // (2 * 60 * 60) + 60 seg
+        expiresInValue_ = "2h";
+        maxAgeSecondsValue_ = 7200; // (2 * 60 * 60) + 60 seg
         break;
       case "DOCEN":
-        expiresInValue = "1.5h";
-        maxAgeSecondsValue = 5460; // (1.5 * 60 * 60) + 60 seg
+        expiresInValue_ = "1.5h";
+        maxAgeSecondsValue_ = 5400; // (1.5 * 60 * 60) + 60 seg
         break;
       case "ALUMN":
-        expiresInValue = "1h";
-        maxAgeSecondsValue = 3660; // (1 * 60 * 60) + 60 seg
+        expiresInValue_ = "1h";
+        maxAgeSecondsValue_ = 3600; // (1 * 60 * 60) + 60 seg
         break;
       case "TUTOR":
-        expiresInValue = "1h";
-        maxAgeSecondsValue = 3660; // (1 * 60 * 60) + 60 seg
+        expiresInValue_ = "1h";
+        maxAgeSecondsValue_ = 3600; // (1 * 60 * 60) + 60 seg
         break;
       case "ASPIR":
-        expiresInValue = "30m";
-        maxAgeSecondsValue = 1860; // (0.5 * 60 * 60) + 60 seg
+        expiresInValue_ = "30m";
+        maxAgeSecondsValue_ = 1800; // (0.5 * 60 * 60) + 60 seg
         break;
       default: // Rol por defecto o desconocido
-        expiresInValue = "30m";
-        maxAgeSecondsValue = 1860;
+        expiresInValue_ = "30m";
+        maxAgeSecondsValue_ = 1800;
         break;
     }
 
     // --- GENERACIÓN DEL JWT ---
-    const tokenPayload = {
+    const tokenPayload_ = {
       userId: user.id,
       userEmail: user.email,
       userRole: user.rol_codigo,
     };
 
     // Generación del token
-    const generatedToken = jwt.sign(tokenPayload, JWT_SECRET, {
-      expiresIn: "0.5h",
+    const generatedToken_ = jwt.sign(tokenPayload_, JWT_SECRET_, {
+      expiresIn: expiresInValue_, // Duración dinámica por roles
     });
 
     // DATOS DE USUARIO
-    const userData = {
+    const userData_ = {
       id: user.id,
       email: user.email,
-      rol_codigo: user.rol_codigo,
+      //password_hash: user.password_hash,
       nombre: user.nombre,
       ap_pat: user.ap_pat,
       ap_mat: user.ap_mat,
+      rol_codigo: user.rol_codigo,
+      is_active: user.is_active,
     };
 
-    const response = new Response(
+    const response_ = new Response(
       JSON.stringify({
         message: "Inicio de sesión exitoso :)",
-        user: userData,
+        user: userData_,
       }),
       {
         status: 200, // OK
@@ -130,27 +132,27 @@ export async function POST(request) {
           "Content-Type": "application/json",
           //TOKEN CONFIG
           "Set-Cookie":
-            `token=${generatedToken}; HttpOnly; Path=/; Max-Age=360; SameSite=Lax` +
+            `token=${generatedToken_}; HttpOnly; Path=/; Max-Age=${maxAgeSecondsValue_}; SameSite=Lax` +
             (process.env.NODE_ENV === "production" ? "; Secure" : ""),
         },
       }
     );
 
-    return response;
+    return response_;
   } catch (error) {
-    console.error("Error en en login", error);
+    console.error("Error en en login:", error);
     return new Response(
       JSON.stringify({
         error: "Error interno del servidor al intentar iniciar sesión.",
       }),
       {
         status: 500,
-        headers: { "Content-type": "application/json" },
+        headers: { "Content-Type": "application/json" },
       }
     );
   } finally {
-    if (client) {
-      client.release();
+    if (client_) {
+      client_.release();
     }
   }
 }

@@ -1,7 +1,6 @@
 import { getClient } from "@/lib/db";
-import jwt, { TokenExpiredError } from "jsonwebtoken";
-import { Joan } from "next/font/google";
-import cookies from "next/headers";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 const JWT_SECRET_ = process.env.JWT_SECRET || "fallback_secret_for_dev_only";
 
@@ -19,11 +18,13 @@ export async function GET() {
     }
 
     let decodedToken_;
+
     try {
       decodedToken_ = jwt.verify(token_, JWT_SECRET_);
     } catch (jwtError) {
       console.error("Token JWT inválido o expirado:", jwtError.message);
 
+      // Se le pide al navegador que elimine la cookie del token
       const expiredResponse_ = new Response(
         JSON.stringify({
           isAuthenticated: false,
@@ -33,32 +34,46 @@ export async function GET() {
       );
       expiredResponse_.headers.set(
         "Set-Cookie",
-        `token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`
+        `token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax` +
+          (process.env.NODE_ENV === "production" ? "; Secure" : "")
       );
       return expiredResponse_;
     }
 
-    // Obtener más datos del usuario
+    // Obtener datos del usuario
     client_ = await getClient();
     const userDbResult_ = await client_.query(
-      "SELECT nombre, ap_pat, ap_mat FROM usuarios WHERE id = $1;",
+      "SELECT id, email, nombre, ap_pat, ap_mat, rol_codigo, is_active FROM usuarios WHERE id = $1;",
       [decodedToken_.userId]
     );
     const userFromDb_ = userDbResult_.rows[0];
-    if (userFromDb_) {
-      return new Response(
+
+    if (!userFromDb_ || !userFromDb_.is_active) {
+      const inactiveUserResponse_ = new Response(
         JSON.stringify({
-          isAuthenticated: true,
-          user: { ...decodedToken_, ...userFromDb_ },
+          isAuthenticated: false,
+          message: "Usuario no encontrado o inactivo.",
         }),
-        { status: 200 }
+        { status: 401 }
       );
+
+      inactiveUserResponse_.headers.set(
+        "Set-Cookie",
+        `token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax` +
+          (process.env.NODE_ENV === "production" ? "; Secure" : "")
+      );
+
+      return inactiveUserResponse_;
     }
 
     const userData_ = {
-      id: decodedToken_.userId,
-      email: decodedToken_.email,
-      rol_codigo: decodedToken_.userRole,
+      id: userFromDb_.id,
+      email: userFromDb_.email,
+      nombre: userFromDb_.nombre,
+      ap_pat: userFromDb_.ap_pat,
+      ap_mat: userFromDb_.ap_mat,
+      rol_codigo: userFromDb_.rol_codigo,
+      is_active: userFromDb_.is_active,
     };
 
     // Devolver la info del usuario autenticado
