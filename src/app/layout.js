@@ -1,7 +1,6 @@
-// SIMULATION
-//import React, { useState } from "react";
-
 "use client";
+
+import React from "react";
 
 // Fonts
 import { Geist, Geist_Mono } from "next/font/google";
@@ -10,14 +9,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 // Components
-import Navbar from "../components/Navbar";
-import LoginPage from "./(authEnProceso)/login/page";
 import AppContent_ from "@/components/AppContent";
 
 // AuthProvider
 import { AuthProvider_ } from "@/contexts/AuthContext";
-import { useRef } from "react";
-import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

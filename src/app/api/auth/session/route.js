@@ -8,7 +8,7 @@ export async function GET() {
   let client_;
 
   try {
-    const cookieStore_ = cookies();
+    const cookieStore_ = await cookies();
     const token_ = cookieStore_.get("token")?.value;
 
     if (!token_) {
