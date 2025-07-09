@@ -1,3 +1,4 @@
+// sckolar-biscuit-nextjs/src/components/AppContent.jsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -6,7 +7,7 @@ import LoginPage from "../app/(authEnProceso)/login/page";
 import { useAuth_ } from "@/contexts/AuthContext";
 import Navbar from "./Navbar";
 
-export default function AppContent_() {
+export default function AppContent_({ children }) {
   const router_ = useRouter();
 
   const {
@@ -61,88 +62,121 @@ export default function AppContent_() {
     }
   }, [isAuthenticated, currentInactivityTimeout_]);
 
-  let PageContent_;
-  if (loadingAuth) {
-    PageContent_ = (
-      <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
-        <p className="text-5xl text-gray-700">Cargando sesión...</p>
-      </div>
-    );
-  } else if (!isAuthenticated) {
-    PageContent_ = <LoginPage />;
-  } else {
-    switch (user.rol_codigo) {
-      case "ADMIN":
-        PageContent_ = (
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-            <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
-              Dashboard de Administrador
-            </h1>
-            <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
-              Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
-            </p>
-            <p className="text-gray-600">
-              Tiempo de inactividad asignado:{" "}
-              {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
-            </p>
-          </div>
-        );
-        break;
-      case "DOCEN":
-        PageContent_ = (
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-            <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
-              Dashboard de Docente
-            </h1>
-            <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
-              Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
-            </p>
-            <p className="text-gray-600">
-              Tiempo de inactividad asignado:{" "}
-              {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
-            </p>
-          </div>
-        );
-        break;
-      case "ALUMN":
-        PageContent_ = (
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-            <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
-              Dashboard de Alumno
-            </h1>
-            <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
-              Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
-            </p>
-            <p className="text-gray-600">
-              Tiempo de inactividad asignado:{" "}
-              {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
-            </p>
-          </div>
-        );
-        break;
-      default:
-        PageContent_ = (
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-            <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
-              Bienvenido, {user.nombre}
-            </h1>
-            <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
-              Dashboard general ({user.rol_codigo}).
-            </p>
-            <p className="text-gray-600">
-              Tiempo de inactividad asignado:{" "}
-              {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
-            </p>
-          </div>
-        );
-        break;
-    }
-  }
+  // Lógica de renderizado de páginas
+  // Definir rutas públicas
+  useEffect(() => {
+    const publicRoutes_ = [
+      "/",
+      "/login",
+      "/registro",
+      "/contacto",
+      "/not-found",
+    ];
 
-  return (
-    <>
+    // Verificiación
+    const isPublicRoute_ = publicRoutes_.includes(router_.pathname);
+
+    let PageContent_;
+
+    if (loadingAuth) {
+      PageContent_ = (
+        <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
+          <p className="text-5xl text-gray-700">Cargando sesión...</p>
+        </div>
+      );
+    } else if (!isAuthenticated) {
+      // Si el usuario NO está autenticado
+
+      if (isPublicRoute_) {
+        return (
+          <>
+            <Navbar />
+            {children}
+          </>
+        );
+      } else {
+        if (router_.pathname !== "/login") {
+          router_.push("/login");
+        }
+        PageContent_ = <LoginPage />;
+      }
+    } else {
+      // Si es usuario SÍ está autenticado
+
+      switch (user.rol_codigo) {
+        case "ADMIN":
+          PageContent_ = (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+              <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+                Dashboard de Administrador
+              </h1>
+              <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
+                Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
+              </p>
+              <p className="text-gray-600">
+                Tiempo de inactividad asignado:{" "}
+                {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
+              </p>
+            </div>
+          );
+          break;
+        case "DOCEN":
+          PageContent_ = (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+              <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+                Dashboard de Docente
+              </h1>
+              <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
+                Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
+              </p>
+              <p className="text-gray-600">
+                Tiempo de inactividad asignado:{" "}
+                {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
+              </p>
+            </div>
+          );
+          break;
+        case "ALUMN":
+          PageContent_ = (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+              <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+                Dashboard de Alumno
+              </h1>
+              <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
+                Bienvenido, {user.nombre} {user.ap_pat} ({user.rol_codigo}).
+              </p>
+              <p className="text-gray-600">
+                Tiempo de inactividad asignado:{" "}
+                {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
+              </p>
+            </div>
+          );
+          break;
+        default:
+          PageContent_ = (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+              <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+                Bienvenido, {user.nombre}
+              </h1>
+              <p className="text-xl text-gray-700 mb-10 text-center max-w-3xl">
+                Dashboard general ({user.rol_codigo}).
+              </p>
+              <p className="text-gray-600">
+                Tiempo de inactividad asignado:{" "}
+                {Math.floor(currentInactivityTimeout_ / 1000 / 60)} minutos.
+              </p>
+            </div>
+          );
+          break;
+      }
+    } else {
+      PageContent_ = children;
+    }
+    return (
+      <>
       <Navbar />
       {PageContent_}
     </>
   );
+}
 }

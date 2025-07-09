@@ -1,3 +1,4 @@
+// sckolar-biscuit-nextjs/src/app/layout.js
 "use client";
 
 import React from "react";
