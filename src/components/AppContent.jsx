@@ -62,9 +62,48 @@ export default function AppContent_({ children }) {
     }
   }, [isAuthenticated, currentInactivityTimeout_]);
 
-  // Lógica de renderizado de páginas
-  // Definir rutas públicas
+  // Lógica de protección de rutas
   useEffect(() => {
+    const publicRoutes_ = [
+      "/",
+      "/contacto",
+      "/not-found",
+      "/registro",
+      "/login",
+    ];
+
+    // Verificiación
+    const isPublicRoute_ = publicRoutes_.includes(router_.pathname);
+
+    if (loadingAuth) {
+      return;
+    }
+
+    // Si el usuario NO está autenticado
+    if (!isAuthenticated) {
+      if (!isPublicRoute_) {
+        if (router_.pathname !== "/login") {
+          router_.push("/login");
+        }
+      }
+    } else {
+      if (router_.pathname === "/login") {
+        router_.push("/");
+      }
+    }
+  }, [isAuthenticated, loadingAuth, router_.pathname, router_]);
+
+  // Lógica de renderizado
+  let contentToRender_;
+  if (loadingAuth) {
+    // Cargando
+    return (
+      <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
+        <p className="text-5xl text-gray-700">Cargando sesión...</p>
+      </div>
+    );
+  } else if (!isAuthenticated) {
+    // No autenticado
     const publicRoutes_ = [
       "/",
       "/login",
@@ -76,36 +115,17 @@ export default function AppContent_({ children }) {
     // Verificiación
     const isPublicRoute_ = publicRoutes_.includes(router_.pathname);
 
-    let PageContent_;
-
-    if (loadingAuth) {
-      PageContent_ = (
-        <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
-          <p className="text-5xl text-gray-700">Cargando sesión...</p>
-        </div>
-      );
-    } else if (!isAuthenticated) {
-      // Si el usuario NO está autenticado
-
-      if (isPublicRoute_) {
-        return (
-          <>
-            <Navbar />
-            {children}
-          </>
-        );
-      } else {
-        if (router_.pathname !== "/login") {
-          router_.push("/login");
-        }
-        PageContent_ = <LoginPage />;
-      }
+    if (isPublicRoute_) {
+      contentToRender_ = children;
     } else {
-      // Si es usuario SÍ está autenticado
-
+      contentToRender_ = <LoginPage />;
+    }
+  } else {
+    // Autenticado
+    if (router_.pathname === "/") {
       switch (user.rol_codigo) {
         case "ADMIN":
-          PageContent_ = (
+          contentToRender_ = (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
               <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
                 Dashboard de Administrador
@@ -121,7 +141,7 @@ export default function AppContent_({ children }) {
           );
           break;
         case "DOCEN":
-          PageContent_ = (
+          contentToRender_ = (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
               <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
                 Dashboard de Docente
@@ -137,7 +157,7 @@ export default function AppContent_({ children }) {
           );
           break;
         case "ALUMN":
-          PageContent_ = (
+          contentToRender_ = (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
               <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
                 Dashboard de Alumno
@@ -153,7 +173,7 @@ export default function AppContent_({ children }) {
           );
           break;
         default:
-          PageContent_ = (
+          contentToRender_ = (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
               <h1 className="text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
                 Bienvenido, {user.nombre}
@@ -170,13 +190,12 @@ export default function AppContent_({ children }) {
           break;
       }
     } else {
-      PageContent_ = children;
+      return (
+        <>
+          <Navbar />
+          {contentToRender_}
+        </>
+      );
     }
-    return (
-      <>
-      <Navbar />
-      {PageContent_}
-    </>
-  );
-}
+  }
 }
