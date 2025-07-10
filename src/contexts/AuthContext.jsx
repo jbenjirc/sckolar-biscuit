@@ -9,7 +9,7 @@ export const AuthContext_ = createContext();
 
 const INACTIVITY_TIMEOUTS_BY_ROLE_ = {
   // milisegundos
-  ADMIN: 30 * 60 * 1000,
+  ADMIN: 30 * 60 * 100, // 30 * 60 * 1000,
   DOCEN: 20 * 60 * 1000,
   ALUMN: 15 * 60 * 1000,
   TUTOR: 15 * 60 * 1000,

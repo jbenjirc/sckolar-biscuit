@@ -1,3 +1,4 @@
+// sckolar-biscuit-nextjs/src/app/(authEnProceso)/login/page.jsx
 "use client";
 
 import React, { useState } from "react";
@@ -62,7 +63,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
+    <div className="container mx-auto p-6 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Iniciar sesión

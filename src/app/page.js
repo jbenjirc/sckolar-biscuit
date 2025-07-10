@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] p-8">
       <h1 className="text-5xl font-extrabold text-blue-700 mb-6 text-center leading-tight">
         Bienvenido a Sckolar Biscuit Suite
       </h1>
@@ -11,6 +11,6 @@ export default function Home() {
       <p className="text-gray-600">
         Utiliza la barra de navegación superior para explorar.
       </p>
-    </div>
+    </main>
   );
 }

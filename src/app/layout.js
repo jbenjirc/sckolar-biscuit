@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
               margin: 0;
               padding 0;
               box-sizing: border-box;
-              background-color: #f3f4ff6;
+              background-color: rgb(224 231 255)
             }
           `}
         </style>

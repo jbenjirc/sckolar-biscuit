@@ -72,8 +72,8 @@ export async function POST(request) {
 
     switch (user.rol_codigo) {
       case "ADMIN":
-        expiresInValue_ = "2h";
-        maxAgeSecondsValue_ = 7200; // (2 * 60 * 60) + 60 seg
+        expiresInValue_ = "0.05h";
+        maxAgeSecondsValue_ = 180; // (2 * 60 * 60) + 60 seg
         break;
       case "DOCEN":
         expiresInValue_ = "1.5h";
