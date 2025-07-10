@@ -1,3 +1,4 @@
+// skolar-biscuit-nextjs/src/app/api/auth/session/route.js
 import { getClient } from "@/lib/db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";

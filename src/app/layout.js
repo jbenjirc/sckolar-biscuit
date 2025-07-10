@@ -2,18 +2,10 @@
 "use client";
 
 import React from "react";
-
-// Fonts
-import { Geist, Geist_Mono } from "next/font/google";
-
-// Styles
-import "./globals.css";
-
-// Components
-import AppContent_ from "@/components/AppContent";
-
-// AuthProvider
-import { AuthProvider_ } from "@/contexts/AuthContext";
+import { Geist, Geist_Mono } from "next/font/google"; // Fonts
+import "./globals.css"; // Styles
+import AppContent_ from "@/components/AppContent"; // Components
+import { AuthProvider_ } from "@/contexts/AuthContext"; // AuthProvider
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +48,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider_>
-          <AppContent_ children={children} />
+          <AppContent_>{children}</AppContent_>
         </AuthProvider_>
       </body>
     </html>

@@ -5,7 +5,7 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // 1. Crear el contexto
-export const AuthContext_ = createContext(null);
+export const AuthContext_ = createContext();
 
 const INACTIVITY_TIMEOUTS_BY_ROLE_ = {
   // milisegundos
@@ -17,20 +17,20 @@ const INACTIVITY_TIMEOUTS_BY_ROLE_ = {
   DEFAULT: 10 * 60 * 1000,
 };
 
-// 2. Crear el Proveedor de Autenticación (AuthContext.Provider)
+// 2. Crear el Proveedor de Autenticación (AuthContext_.Provider)
 export const AuthProvider_ = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const router = useRouter();
 
-  // Función para manejar el login
+  // Usuario Loggeado
   const login_ = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
   };
 
-  // Func para manejar el logout
+  // Usuario desloggeado
   const logout_ = async (redirect = true) => {
     // Manda a llamar a la API Route de logout para eliminar la cookie HttpOnly
     try {
@@ -61,13 +61,14 @@ export const AuthProvider_ = ({ children }) => {
           // Si se confirma la Auth, entonces se actualiza el estado
           setUser(data_.user);
           setIsAuthenticated(true);
+          router.push("/dashboard");
         } else {
           // Si no, se limpia el estado
           setUser(null);
           setIsAuthenticated(false);
           // Si la API devuelve 401 o una sesión no válida, redirecciona al login
           if (router.pathname !== "/login") {
-            router.push("/login");
+            router.push("/");
           }
         }
       } catch (error) {
@@ -76,7 +77,7 @@ export const AuthProvider_ = ({ children }) => {
         setIsAuthenticated(false);
 
         if (router.pathname !== "/login") {
-          router.push("/"); // Redirige al login en caso de error de red
+          router.push("/login"); // Redirige al login en caso de error de red
         }
       } finally {
         setLoadingAuth(false); // La carga se finaliza sin importar el resultado
