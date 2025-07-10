@@ -24,7 +24,7 @@ export const AuthProvider_ = ({ children }) => {
   const [loadingAuth, setLoadingAuth] = useState(true);
   const router = useRouter();
 
-  // F para manejar el login
+  // Función para manejar el login
   const login_ = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
@@ -32,7 +32,7 @@ export const AuthProvider_ = ({ children }) => {
 
   // Func para manejar el logout
   const logout_ = async (redirect = true) => {
-    // Manda a llamar a la API Route de logout para eliminar la cokie  HttpOnly
+    // Manda a llamar a la API Route de logout para eliminar la cookie HttpOnly
     try {
       const response_ = await fetch("/api/auth/logout", { method: "POST" });
       if (response_.ok) {
@@ -76,7 +76,7 @@ export const AuthProvider_ = ({ children }) => {
         setIsAuthenticated(false);
 
         if (router.pathname !== "/login") {
-          router.push("/login"); // Redirige al login en caso de error de red
+          router.push("/"); // Redirige al login en caso de error de red
         }
       } finally {
         setLoadingAuth(false); // La carga se finaliza sin importar el resultado

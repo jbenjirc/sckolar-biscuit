@@ -97,7 +97,7 @@ export default function AppContent_({ children }) {
   let contentToRender_;
   if (loadingAuth) {
     // Cargando
-    return (
+    contentToRender_ = (
       <div className="container mx-auto p-6 bg-gray-50 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
         <p className="text-5xl text-gray-700">Cargando sesión...</p>
       </div>
@@ -190,12 +190,14 @@ export default function AppContent_({ children }) {
           break;
       }
     } else {
-      return (
-        <>
-          <Navbar />
-          {contentToRender_}
-        </>
-      );
+      contentToRender_ = children;
     }
   }
+
+  return (
+    <>
+      <Navbar />
+      {contentToRender_}
+    </>
+  );
 }

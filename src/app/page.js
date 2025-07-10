@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
