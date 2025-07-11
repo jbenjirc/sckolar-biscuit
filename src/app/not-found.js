@@ -1,3 +1,4 @@
+// sckolar-biscuit-nextjs/src/app/not-found.js
 import Link from "next/link";
 
 export default function NotFound() {

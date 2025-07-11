@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] p-8">
+    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] p-8 bg-indigo-100">
       <h1 className="text-5xl font-extrabold text-blue-700 mb-6 text-center leading-tight">
         Bienvenido a Sckolar Biscuit Suite
       </h1>
