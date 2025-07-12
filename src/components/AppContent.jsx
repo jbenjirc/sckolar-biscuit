@@ -6,13 +6,11 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth_ } from "@/contexts/AuthContext";
 import Navbar from "./Navbar";
 
-const publicRoutes_ = ["/", "/login", "/registro", "/contacto", "/not-found"];
+const publicRoutes_ = ["/", "/login", "/registro", "/contacto"];
 
 export default function AppContent_({ children }) {
   const router_ = useRouter();
   const pathname_ = usePathname();
-  const is404 = children?.type?.name === "NotFound";
-  console.log({ is404 });
 
   const {
     user,
@@ -72,7 +70,6 @@ export default function AppContent_({ children }) {
 
   // -- Lógica de protección de rutas --
   useEffect(() => {
-    console.log({ pathname_ });
     if (loadingAuth) return;
 
     // NO pública y NO autenticado
@@ -99,10 +96,11 @@ export default function AppContent_({ children }) {
     );
   }
 
+  console.log("AppContent_ rendered", { pathname_ });
   return (
     <>
       <Navbar />
-      {(isPublicRoute_ || isAuthenticated || is404) && children}
+      {(isPublicRoute_ || isAuthenticated) && children}
     </>
   );
 }

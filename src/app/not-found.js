@@ -1,7 +1,9 @@
 // sckolar-biscuit-nextjs/src/app/not-found.js
+"use client";
 import Link from "next/link";
 
 export default function NotFound() {
+  console.log("Rendering 404 component");
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-68px)] bg-gradient-to-br from-blue-50 to-indigo-100 p-8 text-center">
       <h1 className="text-8xl font-extrabold text-gray-800 mb-4 animate-bounce">
