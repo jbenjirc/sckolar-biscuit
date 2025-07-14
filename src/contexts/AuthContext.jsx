@@ -22,7 +22,7 @@ export const AuthProvider_ = ({ children }) => {
   const [user, setUser] = useState();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
-  const router = useRouter();
+  const router_ = useRouter();
 
   // Usuario Loggeado
   const login_ = (userData) => {
@@ -39,7 +39,7 @@ export const AuthProvider_ = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         if (redirect) {
-          router.push("/login");
+          router_.push("/login");
         }
       } else {
         console.error("Error al cerrar sesión en el servidor.");
@@ -61,14 +61,20 @@ export const AuthProvider_ = ({ children }) => {
           // Si se confirma la Auth, entonces se actualiza el estado
           setUser(data_.user);
           setIsAuthenticated(true);
-          router.push("/dashboard");
+          if (
+            router_.pathname === "/login" ||
+            router_.pathname === "/registro" ||
+            router_.pathname === "/"
+          ) {
+            router_.push("/dashboard");
+          }
         } else {
           // Si no, se limpia el estado
           setUser(null);
           setIsAuthenticated(false);
           // Si la API devuelve 401 o una sesión no válida, redirecciona al login
-          if (router.pathname !== "/login") {
-            router.push("/");
+          if (router_.pathname !== "/login") {
+            return;
           }
         }
       } catch (error) {
@@ -76,8 +82,8 @@ export const AuthProvider_ = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
 
-        if (router.pathname !== "/login") {
-          router.push("/login"); // Redirige al login en caso de error de red
+        if (router_.pathname !== "/login") {
+          router_.push("/login"); // Redirige al login en caso de error de red
         }
       } finally {
         setLoadingAuth(false); // La carga se finaliza sin importar el resultado
@@ -85,7 +91,7 @@ export const AuthProvider_ = ({ children }) => {
     };
 
     verifySession_();
-  }, [router]);
+  }, [router_]);
 
   const AuthContextValue_ = {
     user,

@@ -6,8 +6,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth_ } from "@/contexts/AuthContext";
 import Navbar from "./Navbar";
 
-const publicRoutes_ = ["/", "/login", "/registro", "/contacto"];
-
 export default function AppContent_({ children }) {
   const router_ = useRouter();
   const pathname_ = usePathname();
@@ -66,24 +64,31 @@ export default function AppContent_({ children }) {
   }, [isAuthenticated, currentInactivityTimeout_]);
 
   // Verificiación de ruta pública
+  const publicRoutes_ = ["/", "/login", "/registro", "/contacto", "/not-found"];
   const isPublicRoute_ = publicRoutes_.includes(pathname_);
 
+  const isNotFound_ =
+    children && children.type && children.type.name === "NotFound";
+
   // -- Lógica de protección de rutas --
+
   useEffect(() => {
     if (loadingAuth) return;
+    if (isNotFound_) return;
+    if (!isAuthenticated) return;
 
     // NO pública y NO autenticado
     if (!isPublicRoute_ && !isAuthenticated) {
-      router_.push("/login");
+      router_.push("/");
     }
 
-    // Sí AUTENTICADO y quiere ir a login o registro
-    if (
-      isAuthenticated &&
-      (pathname_ === "/login" || pathname_ === "/registro")
-    ) {
-      router_.push("/dashboard");
-    }
+    //   // Sí AUTENTICADO y quiere ir a login o registro
+    //   if (
+    //     isAuthenticated &&
+    //     (pathname_ === "/login" || pathname_ === "/registro")
+    //   ) {
+    //     router_.push("/dashboard");
+    //   }
   }, [isAuthenticated, loadingAuth, pathname_, router_]);
 
   // -- Lógica de renderizado --
@@ -94,6 +99,11 @@ export default function AppContent_({ children }) {
         <p className="text-5xl text-gray-700">Cargando sesión...</p>
       </div>
     );
+  }
+
+  // Si el children es el componente NotFound
+  if (children && children.type && children.type.name === "NotFound") {
+    return children;
   }
 
   console.log("AppContent_ rendered", { pathname_ });
