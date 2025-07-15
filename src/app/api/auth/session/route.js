@@ -13,6 +13,7 @@ export async function GET() {
     const token_ = cookieStore_.get("token")?.value;
 
     if (!token_) {
+      console.log("llego hasta aquí");
       return new Response(JSON.stringify({ isAuthenticated: false }), {
         status: 200,
       });

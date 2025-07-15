@@ -64,31 +64,41 @@ export default function AppContent_({ children }) {
   }, [isAuthenticated, currentInactivityTimeout_]);
 
   // Verificiación de ruta pública
-  const publicRoutes_ = ["/", "/login", "/registro", "/contacto", "/not-found"];
-  const isPublicRoute_ = publicRoutes_.includes(pathname_);
+  const validRoutes_ = [
+    "/",
+    "/login",
+    "/registro",
+    "/contacto",
+    "/not-found",
+    "/dashboard",
+  ];
+  const isValidRoute_ = validRoutes_.includes(pathname_);
 
-  const isNotFound_ =
-    children && children.type && children.type.name === "NotFound";
+  console.log("isValidRoute_", isValidRoute_);
 
   // -- Lógica de protección de rutas --
-
+  console.log("pathname: ", pathname_);
   useEffect(() => {
+    if (pathname_ === "/_not-found") return;
+    if (!isValidRoute_) return;
+    console.log("isPublicRoute_ is true, checking authentication...");
     if (loadingAuth) return;
-    if (isNotFound_) return;
+    console.log("loadingAuth is false, checking authentication...");
     if (!isAuthenticated) return;
+    console.log("User is authenticated, checking route...");
 
-    // NO pública y NO autenticado
-    if (!isPublicRoute_ && !isAuthenticated) {
+    // NO válida y NO autenticado
+    if (!isValidRoute_ && !isAuthenticated) {
       router_.push("/");
     }
 
     //   // Sí AUTENTICADO y quiere ir a login o registro
-    //   if (
-    //     isAuthenticated &&
-    //     (pathname_ === "/login" || pathname_ === "/registro")
-    //   ) {
-    //     router_.push("/dashboard");
-    //   }
+    if (
+      isAuthenticated &&
+      (pathname_ === "/login" || pathname_ === "/registro")
+    ) {
+      router_.push("/dashboard");
+    }
   }, [isAuthenticated, loadingAuth, pathname_, router_]);
 
   // -- Lógica de renderizado --
@@ -100,17 +110,12 @@ export default function AppContent_({ children }) {
       </div>
     );
   }
-
-  // Si el children es el componente NotFound
-  if (children && children.type && children.type.name === "NotFound") {
-    return children;
-  }
-
   console.log("AppContent_ rendered", { pathname_ });
+
   return (
     <>
       <Navbar />
-      {(isPublicRoute_ || isAuthenticated) && children}
+      {(isValidRoute_ || isAuthenticated) && children}
     </>
   );
 }
