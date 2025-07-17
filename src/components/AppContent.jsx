@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth_ } from "@/contexts/AuthContext";
 import Navbar from "./Navbar";
+import { throwIfDisallowedDynamic } from "next/dist/server/app-render/dynamic-rendering";
 
 export default function AppContent_({ children }) {
   const router_ = useRouter();
@@ -65,13 +66,8 @@ export default function AppContent_({ children }) {
     }
   }, [isAuthenticated, currentInactivityTimeout_]);
 
-  // -- Lógica de protección de rutas --
+  // -- Enrutamiento en Login o Registro --
   useEffect(() => {
-    if (!isAuthenticated && isPrivateRoute_) {
-      console.log("Ruta privada sin autenticación. Redirigiendo a /login");
-      router_.push("/login");
-    }
-
     if (!loadingAuth && isAuthenticated) {
       if (pathname_ === "/login") {
         router_.push("/dashboard");

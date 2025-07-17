@@ -59,18 +59,33 @@ const Navbar = () => {
           {isAuthenticated && (
             <>
               {user && user.rol_codigo === "ADMIN" && (
-                <Link
-                  href="/alumnas"
-                  className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-                >
-                  Gestión Alumnos
-                </Link>
+                <>
+                  <Link
+                    href="/solicitudes"
+                    className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                  >
+                    Solicitudes
+                  </Link>
+                  <Link
+                    href="/alumnas"
+                    className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                  >
+                    Gestión Alumnos
+                  </Link>
+                </>
               )}
+              <Link
+                href="/dashboard"
+                className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+              >
+                Dashboard
+              </Link>
               <button
                 onClick={handleLogout_}
                 className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md text-base transition-colors duration-200 ml-4"
               >
-                Cerrar Sesión {user ? `(${user.rol_codigo})` : ""}
+                Cerrar Sesión
+                {/* Cerrar Sesión {user ? `${user.nombre}` : ""} */}
               </button>
             </>
           )}
