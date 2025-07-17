@@ -1,7 +1,7 @@
 // sckolar-biscuit-nextjs/src/components/AppContent.jsx
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth_ } from "@/contexts/AuthContext";
 import Navbar from "./Navbar";
@@ -14,10 +14,12 @@ export default function AppContent_({ children }) {
     user,
     isAuthenticated,
     loadingAuth,
-    //login_,
     logout_,
     INACTIVITY_TIMEOUTS_BY_ROLE_,
   } = useAuth_();
+
+  const privateRoutes_ = ["/dashboard", "/alumnos"];
+  const isPrivateRoute_ = privateRoutes_.includes(pathname_);
 
   const activityTimeoutRef_ = useRef(null);
 
@@ -63,43 +65,19 @@ export default function AppContent_({ children }) {
     }
   }, [isAuthenticated, currentInactivityTimeout_]);
 
-  // Verificiación de ruta pública
-  const validRoutes_ = [
-    "/",
-    "/login",
-    "/registro",
-    "/contacto",
-    "/not-found",
-    "/dashboard",
-  ];
-  const isValidRoute_ = validRoutes_.includes(pathname_);
-
-  console.log("isValidRoute_", isValidRoute_);
-
   // -- Lógica de protección de rutas --
-  console.log("pathname: ", pathname_);
   useEffect(() => {
-    if (pathname_ === "/_not-found") return;
-    if (!isValidRoute_) return;
-    console.log("isPublicRoute_ is true, checking authentication...");
-    if (loadingAuth) return;
-    console.log("loadingAuth is false, checking authentication...");
-    if (!isAuthenticated) return;
-    console.log("User is authenticated, checking route...");
-
-    // NO válida y NO autenticado
-    if (!isValidRoute_ && !isAuthenticated) {
-      router_.push("/");
+    if (!isAuthenticated && isPrivateRoute_) {
+      console.log("Ruta privada sin autenticación. Redirigiendo a /login");
+      router_.push("/login");
     }
 
-    //   // Sí AUTENTICADO y quiere ir a login o registro
-    if (
-      isAuthenticated &&
-      (pathname_ === "/login" || pathname_ === "/registro")
-    ) {
-      router_.push("/dashboard");
+    if (!loadingAuth && isAuthenticated) {
+      if (pathname_ === "/login") {
+        router_.push("/dashboard");
+      }
     }
-  }, [isAuthenticated, loadingAuth, pathname_, router_]);
+  }, [loadingAuth, isAuthenticated, pathname_, router_]);
 
   // -- Lógica de renderizado --
   if (loadingAuth) {
@@ -115,7 +93,7 @@ export default function AppContent_({ children }) {
   return (
     <>
       <Navbar />
-      {(isValidRoute_ || isAuthenticated) && children}
+      {children}
     </>
   );
 }
