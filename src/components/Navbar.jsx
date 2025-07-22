@@ -69,7 +69,7 @@ const Navbar = () => {
                     title_="Inscripciones"
                     links_={[
                       {
-                        label_: "Nuevas Inscripciones",
+                        label_: "Inscripciones",
                         href_: "/inscripciones",
                       },
                       {
@@ -78,12 +78,48 @@ const Navbar = () => {
                       },
                     ]}
                   />
-                  <Link
-                    href="/alumnos"
-                    className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-                  >
-                    Alumnos
-                  </Link>
+                  <NavbarDropdownList_
+                    title_="Alumnos"
+                    links_={[
+                      {
+                        label_: "Ver Alumnos",
+                        href_: "/alumnos",
+                      },
+                      {
+                        label_: "Calificaciones",
+                        href_: "/calificaciones",
+                      },
+                      {
+                        label_: "Reportes",
+                        href_: "/reportes",
+                      },
+                    ]}
+                  />
+                  <NavbarDropdownList_
+                    title_="Académico"
+                    links_={[
+                      {
+                        label_: "Horarios",
+                        href_: "/horarios",
+                      },
+                      {
+                        label_: "Materias",
+                        href_: "/materias",
+                      },
+                      {
+                        label_: "Grupos",
+                        href_: "/grupos",
+                      },
+                      {
+                        label_: "Justificantes",
+                        href_: "/justificantes",
+                      },
+                      {
+                        label_: "Expedir Certificados",
+                        href_: "/certificados",
+                      },
+                    ]}
+                  />
                   <button
                     onClick={handleLogout_}
                     className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md text-base transition-colors duration-200 ml-4"
