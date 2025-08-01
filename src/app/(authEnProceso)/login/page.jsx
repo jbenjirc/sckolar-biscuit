@@ -63,11 +63,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center">
+    <div className="mx-auto p-6 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center bg-red-200">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Iniciar sesión
-        </h2>
+        </h1>
         <form onSubmit={handleSubmit_} className="space-y-6">
           {/* Campo de email */}
           <div>
@@ -75,7 +75,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
-              Email
+              Email:
             </label>
             <input
               type="email"
