@@ -24,7 +24,7 @@ export default function RegistroPage() {
           para comenzar.
         </p>
         <br></br>
-        <p>Los datos deben de ser del aspirante para inscripción.</p>
+        <p>Los datos deben de ser del aspirante a inscribir.</p>
         <br></br>
 
         <form className="space-y-6">
@@ -34,7 +34,7 @@ export default function RegistroPage() {
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
               CURP:
-              <p className="text-red-500">*</p>
+              <span className="text-red-500"> *</span>
             </label>
             <input
               type="text"
@@ -52,6 +52,7 @@ export default function RegistroPage() {
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
               Contraseña:
+              <span className="text-red-500"> *</span>
             </label>
             <input
               type="password"

@@ -23,7 +23,7 @@ export default function Home() {
               <strong>CTLES:</strong> Acceso al proceso de inscripción y gestión
               de estudiantes.
               <div className="mt-2 rounded-md bg-gray-100 p-4">
-                <strong>Correo:</strong> esco@example.com
+                <strong>Correo:</strong> escolar@exam.com
                 <br />
                 <strong>Contraseña:</strong> esco123
               </div>
@@ -33,9 +33,9 @@ export default function Home() {
               <strong>ADMIN:</strong> Acceso a la administración general del
               sistema.
               <div className="mt-2 rounded-md bg-gray-100 p-4">
-                <strong>Correo:</strong> admin@example.com
+                <strong>Correo:</strong> test@exam.com
                 <br />
-                <strong>Contraseña:</strong> admin123
+                <strong>Contraseña:</strong> contra123
               </div>
             </li>
 

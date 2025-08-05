@@ -120,16 +120,16 @@ const Navbar = () => {
                       },
                     ]}
                   />
-                  <button
-                    onClick={handleLogout_}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md text-base transition-colors duration-200 ml-4"
-                  >
-                    Cerrar Sesión
-                    {/* Cerrar Sesión {user ? `${user.nombre}` : ""} */}
-                  </button>
                 </div>
               </>
             )}
+            <button
+              onClick={handleLogout_}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md text-base transition-colors duration-200 ml-4"
+            >
+              Cerrar Sesión
+              {/* Cerrar Sesión {user ? `${user.nombre}` : ""} */}
+            </button>
           </>
         )}
       </div>
