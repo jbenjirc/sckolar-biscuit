@@ -42,7 +42,7 @@ export default function RegistroPage() {
               value={curp}
               onChange={(e) => setCurp(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="CURP del aspirante"
+              placeholder="ABCD123456HDFGHI01"
               required
             />
           </div>
@@ -74,6 +74,33 @@ export default function RegistroPage() {
             INICIAR INSCRIPCIÓN
           </button>
         </form>
+        {message && (
+          <p
+            className={`mt-6 text-center text-base font-semibold ${
+              isError ? "text-red-600" : "text-green-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
+        <p className="mt-4 text-sm text-gray-600">
+          ¿Ya tienes una cuenta?{" "}
+          <a
+            href="/login"
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Iniciar sesión
+          </a>
+        </p>
+        <p className="mt-2 text-sm text-gray-600">
+          ¿Necesitas ayuda?{" "}
+          <a
+            href="/contacto"
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Contáctanos
+          </a>
+        </p>
       </div>
     </div>
   );
