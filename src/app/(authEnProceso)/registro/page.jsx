@@ -5,13 +5,51 @@ import { useState } from "react";
 import { useAuth_ } from "@/contexts/AuthContext";
 
 export default function RegistroPage() {
-  const [curp, setCurp] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { session_ } = useAuth_();
+
+  const handleSubmit_ = async (e) => {
+    e.preventDefault();
+
+    setMessage("");
+    setIsError(false);
+    setLoading(true);
+
+    try {
+      const response_ = await fetch("/api/auth/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ curp, password }),
+      });
+
+      const data_ = await response_.json();
+
+      if (!response_.ok) {
+        setIsError(true);
+        setMessage(data_.error || "Error al registrar usuario nuevo.");
+        return;
+      }
+
+      setMessage("Registro exitoso. Redirigiendo...");
+      setIsError(false);
+
+      session_(data_.user);
+    } catch (error) {
+      console.error("Error al registrar usuario", error);
+      setIsError(true);
+      setMessage("Error de red o interno al intentar iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mx-auto p-6 min-h-[calc(100vh-68px)] flex flex-col items-center justify-center bg-red-200">
@@ -27,22 +65,22 @@ export default function RegistroPage() {
         <p>Los datos deben de ser del aspirante a inscribir.</p>
         <br></br>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit_} className="space-y-6">
           <div>
             <label
-              htmlFor="curp"
+              htmlFor="email"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
-              CURP:
+              Correo electrónico:
               <span className="text-red-500"> *</span>
             </label>
             <input
-              type="text"
-              id="curp"
-              value={curp}
-              onChange={(e) => setCurp(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="ABCD123456HDFGHI01"
+              placeholder="example@correo.com"
               required
             />
           </div>
@@ -71,7 +109,7 @@ export default function RegistroPage() {
             className={`font-bold py-3 px-6 rounded-lg w-full shadow-md transform transition-all duration-300 focus:outline-none focus:ring
             ${loading} ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text text-white hover:scale-105 focus:blue-300'}`}
           >
-            INICIAR INSCRIPCIÓN
+            CREAR CUENTA
           </button>
         </form>
         {message && (
