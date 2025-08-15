@@ -76,7 +76,7 @@ export default function RegistroPage() {
             </label>
             <input
               type="email"
-              id="email"
+              id="emailForm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -94,7 +94,7 @@ export default function RegistroPage() {
             </label>
             <input
               type="password"
-              id="password"
+              id="passwordForm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
