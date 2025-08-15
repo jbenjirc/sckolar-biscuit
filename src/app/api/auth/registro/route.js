@@ -3,13 +3,14 @@
 import { getClient } from "@/lib/db";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const JWT_SECRET_ = process.env.JWT_SECRET;
 
-function esEmailValido(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+// Función para validar email
+function esEmailValido(correo) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(correo).toLowerCase());
 }
 
 export async function POST(request) {
@@ -19,33 +20,32 @@ export async function POST(request) {
     // 1) Leer y validar payload
     const body = await request.json().catch(() => null);
     if (!body) {
-      return new Response(JSON.stringify({ error: "JSON inválido." }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
     }
 
     let { emailForm, passwordForm } = body;
-    emailLowerCase = String(emailForm || "")
-      .trim()
-      .toLowerCase();
-    password = String(passwordForm || "");
 
-    if (!emailLowerCase || !password) {
-      return new Response(
-        JSON.stringify({ error: "Correo y contraseña son obligatorios." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+    if (!emailForm || !passwordForm) {
+      return NextResponse.json(
+        { error: "Correo y contraseña obligatorios" },
+        { status: 400 }
       );
     }
 
+    // Normalizar email y contraseña
+    const emailLowerCase = String(emailForm || "")
+      .trim()
+      .toLowerCase();
+    const passwordNormalized = String(passwordForm || "").trim();
+
+    // Validación de email
     if (!esEmailValido(emailLowerCase)) {
-      return NextResponse.json({
-        error: "Correo electrónico inválido.",
-        status: 400,
-      });
+      return NextResponse.json(
+        {
+          error: "Correo electrónico inválido.",
+        },
+        { status: 400 }
+      );
     }
 
     // Validación de contraseña...
@@ -55,24 +55,26 @@ export async function POST(request) {
 
     // 3) Verificar duplicado de email
     const dup = await client_.query(
-      "SELECT id FORM punlic.usuarios WHERE email = $1 LIMIT 1",
+      "SELECT id FROM usuarios WHERE email = $1 LIMIT 1",
       [emailLowerCase]
     );
     if (dup.rowCount) {
-      return NextResponse.json({
-        error: "Este correo ya está registrado.",
-        status: 409,
-      });
+      return NextResponse.json(
+        {
+          error: "Este correo ya está registrado.",
+        },
+        { status: 409 }
+      );
     }
 
     // 4) Hashear contraseña
-    const passwordHash = await bcryptjs.hash(password, 12);
+    const passwordHash = await bcryptjs.hash(passwordNormalized, 12);
 
     // 5) Insertar Usuario Aspirante
     const insert = await client_.query(
-      `INSERT INTO public.usuarios (email, password_hash)
-      VALUES ($1,$2)
-      RETURNING id, email, rol_codigo`,
+      `INSERT INTO usuarios (email, password_hash, emailalterno)
+      VALUES ($1,$2, $1)
+      RETURNING id, emailalterno, rol_codigo`,
       [emailLowerCase, passwordHash]
     );
 
@@ -82,12 +84,13 @@ export async function POST(request) {
     const tokenPayload_ = {
       userId: user.id,
       userEmail: user.email,
+      userEmailAlterno: user.emailAlterno,
       userRole: user.rol_codigo,
     };
 
     if (JWT_SECRET_) {
       const generatedToken_ = jwt.sign(tokenPayload_, JWT_SECRET_, {
-        expiresIn: "1h",
+        expiresIn: "1min",
       });
 
       cookies().set("token", generatedToken_, {
@@ -95,33 +98,27 @@ export async function POST(request) {
         secure: true,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60, // 1 hora,
+        maxAge: 60, // 1 minuto
       });
     }
 
     // 7) Respuesta exitosa
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        message: "Cuenta creada y sesión iniciada.",
-        user,
-      }),
-      { status: 201, headers: { "Content-Type": "application/json" } }
+    return NextResponse.json(
+      { ok: true, message: "Cuenta creada :)", user },
+      { status: 201 }
     );
   } catch (error) {
     if (error?.code === "23505") {
-      return new Response(JSON.stringify({ error: "Correo ya registrado." }), {
-        status: 409,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json(
+        { error: "Correo ya registrado." },
+        { status: 409 }
+      );
     }
-    console.error("Error en registro - código 23505:", error);
-    return new Response(
-      JSON.stringify({ error: "Error interno del servidror." }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+    console.log("Error en registro:", error);
+
+    return NextResponse.json(
+      { error: "Error en el registro." },
+      { status: 500 }
     );
   } finally {
     try {

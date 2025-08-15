@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useAuth_ } from "@/contexts/AuthContext";
 
 export default function RegistroPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailForm, setEmail] = useState("");
+  const [passwordForm, setPassword] = useState("");
 
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -27,7 +27,7 @@ export default function RegistroPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ curp, password }),
+        body: JSON.stringify({ emailForm, passwordForm }),
       });
 
       const data_ = await response_.json();
@@ -42,6 +42,11 @@ export default function RegistroPage() {
       setIsError(false);
 
       session_(data_.user);
+
+      router.push("/completar-datos"); // Redirigir a completar datos
+      setTimeout(() => {
+        window.location.href = "/completar-datos"; // Redirigir a completar datos
+      }, 2000); // Esperar 2 segundos antes de redirigir
     } catch (error) {
       console.error("Error al registrar usuario", error);
       setIsError(true);
@@ -68,16 +73,16 @@ export default function RegistroPage() {
         <form onSubmit={handleSubmit_} className="space-y-6">
           <div>
             <label
-              htmlFor="email"
+              htmlFor="emailForm"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
               Correo electrónico:
               <span className="text-red-500"> *</span>
             </label>
             <input
-              type="email"
               id="emailForm"
-              value={email}
+              type="email"
+              value={emailForm}
               onChange={(e) => setEmail(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               placeholder="example@correo.com"
@@ -86,16 +91,16 @@ export default function RegistroPage() {
           </div>
           <div>
             <label
-              htmlFor="password"
+              htmlFor="passwordForm"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
               Contraseña:
               <span className="text-red-500"> *</span>
             </label>
             <input
-              type="password"
               id="passwordForm"
-              value={password}
+              type="password"
+              value={passwordForm}
               onChange={(e) => setPassword(e.target.value)}
               className="shadow-sm appearance-none border border-gray-300 rounded-md py-2 px-3 w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               placeholder="Contraseña"
@@ -109,9 +114,10 @@ export default function RegistroPage() {
             className={`font-bold py-3 px-6 rounded-lg w-full shadow-md transform transition-all duration-300 focus:outline-none focus:ring
             ${loading} ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text text-white hover:scale-105 focus:blue-300'}`}
           >
-            CREAR CUENTA
+            {loading ? "Cargando..." : "CREAR CUENTA"}
           </button>
         </form>
+
         {message && (
           <p
             className={`mt-6 text-center text-base font-semibold ${
